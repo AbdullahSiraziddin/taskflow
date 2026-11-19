@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<h1 class="hero-title mb-3">{% trans "Задания, сдача работ и очередь выступлений в одном месте" %}</h1>
+<p class="text-muted mb-4">{% trans "Платформа для преподавателей и студентов колледжа." %}</p>
+
+<div class="row g-3">
+  <div class="col-md-6 col-xl-3"><div class="card-pastel c-blue">
+    <span class="badge-soft align-self-start">{% trans "Задания" %}</span>
+    <h5>{% trans "Дедлайны и требования всегда под рукой" %}</h5></div></div>
+  <div class="col-md-6 col-xl-3"><div class="card-pastel c-violet">
+    <span class="badge-soft align-self-start">{% trans "Сдача" %}</span>
+    <h5>{% trans "Файлы, ссылки и текст в одной форме" %}</h5></div></div>
+  <div class="col-md-6 col-xl-3"><div class="card-pastel c-yellow">
+    <span class="badge-soft align-self-start">{% trans "Очередь" %}</span>
+    <h5>{% trans "Порядок выступлений формируется сам" %}</h5></div></div>
+  <div class="col-md-6 col-xl-3"><div class="card-pastel c-green">
+    <span class="badge-soft align-self-start">{% trans "Оценки" %}</span>
+    <h5>{% trans "Баллы и комментарии преподавателя" %}</h5></div></div>
+</div>
+{% endblock %}

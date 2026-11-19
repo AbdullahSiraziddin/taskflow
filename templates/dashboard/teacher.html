@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Панель преподавателя" %}{% endblock %}
+
+{% block content %}
+<h1 class="hero-title mb-4">{% trans "Панель управления" %}</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card-pastel c-violet">
+    <span class="badge-soft align-self-start">{% trans "Группы" %}</span>
+    <h2>{{ groups|length }}</h2>
+  </div></div>
+  <div class="col-md-4"><div class="card-pastel c-blue">
+    <span class="badge-soft align-self-start">{% trans "Предметы" %}</span>
+    <h2>{{ subjects|length }}</h2>
+  </div></div>
+  <div class="col-md-4"><div class="card-pastel c-yellow">
+    <span class="badge-soft align-self-start">{% trans "Задания" %}</span>
+    <p class="mb-0">{% trans "Создание заданий появится в следующей части." %}</p>
+  </div></div>
+</div>
+
+<h5 class="mb-3">{% trans "Мои предметы" %}</h5>
+<div class="row g-3">
+  {% for s in subjects %}
+    <div class="col-md-4"><div class="card-pastel c-green">
+      <h5>{{ s.name }}</h5>
+      <span class="small text-muted">{% trans "Группа" %} {{ s.group.name }}</span>
+    </div></div>
+  {% empty %}
+    <p class="text-muted">{% trans "Вам пока не назначены предметы." %}</p>
+  {% endfor %}
+</div>
+{% endblock %}

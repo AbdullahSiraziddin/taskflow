@@ -1,0 +1,47 @@
+:root {
+  --bg: #F7F8FC;  --panel: #EEF0F8;  --text: #17141C;  --muted: #77727B;
+  --blue: #CFE3FA;  --violet: #D7D1F8;  --yellow: #FBEBB5;
+  --green: #C6EFD6;  --red: #F8C9CB;  --mint: #BDEBD9;
+}
+body { background: var(--mint); color: var(--text); font-family: 'DM Sans', sans-serif; }
+.app {
+  background: var(--bg); border-radius: 32px; margin: 16px auto; max-width: 1400px;
+  min-height: calc(100vh - 32px); display: grid;
+  grid-template-columns: 88px 1fr; gap: 24px; padding: 20px;
+}
+.sidebar {
+  background: var(--panel); border-radius: 28px; padding: 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.side-btn {
+  width: 52px; height: 52px; border-radius: 50%; background: #fff; color: var(--text);
+  display: grid; place-items: center; font-size: 1.3rem; text-decoration: none;
+}
+.side-btn.active { background: var(--text); color: #fff; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+.brand { font-weight: 700; font-size: 1.4rem; }
+.hero-title { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 500; line-height: 1.1; }
+.card-pastel {
+  border-radius: 26px; padding: 22px; display: flex; flex-direction: column;
+  gap: 8px; height: 100%;
+}
+.c-blue { background: var(--blue); }
+.c-violet { background: var(--violet); }
+.c-yellow { background: var(--yellow); }
+.c-green { background: var(--green); }
+.c-red { background: var(--red); }
+.badge-soft {
+  background: #fff; color: var(--text); border-radius: 20px;
+  padding: 4px 12px; font-size: .8rem; display: inline-block;
+}
+.form-card { background: #fff; border-radius: 26px; padding: 28px; max-width: 560px; }
+.form-control, .form-select { border-radius: 14px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--violet);
+  display: inline-grid; place-items: center; font-weight: 700;
+}
+
+@media (max-width: 992px) {
+  .app { grid-template-columns: 1fr; border-radius: 20px; margin: 8px; padding: 12px; }
+  .sidebar { flex-direction: row; justify-content: center; order: 3; }
+}

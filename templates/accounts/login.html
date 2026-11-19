@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Вход" %}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% trans "Вход" %}</h1>
+<div class="form-card">
+  <form method="post">
+    {% csrf_token %}
+    {% include 'includes/form_fields.html' %}
+    <button class="btn btn-dark w-100">{% trans "Войти" %}</button>
+  </form>
+  <p class="mt-3 mb-0 small">{% trans "Нет аккаунта?" %} <a href="{% url 'register' %}">{% trans "Зарегистрироваться" %}</a></p>
+</div>
+{% endblock %}
