@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Новое задание" %}{% endblock %}
+
+{% block content %}
+<a href="{% url 'task_list' %}" class="small text-muted text-decoration-none">← {% trans "Назад" %}</a>
+<h1 class="hero-title my-3">{% trans "Для какой группы задание?" %}</h1>
+
+<div class="row g-3">
+  {% for g in groups %}
+    <div class="col-md-6 col-xl-4">
+      <a href="{% url 'task_create' g.pk %}" class="text-decoration-none text-reset">
+        <div class="card-pastel {% cycle 'c-violet' 'c-blue' 'c-yellow' 'c-green' %}">
+          <h3>{{ g.name }}</h3>
+        </div>
+      </a>
+    </div>
+  {% empty %}
+    <p class="text-muted">
+      {% trans "Нет групп, где вы можете создавать задания. Создайте группу и добавьте в неё предмет или попросите преподавателя выдать вам право." %}
+    </p>
+  {% endfor %}
+</div>
+{% endblock %}

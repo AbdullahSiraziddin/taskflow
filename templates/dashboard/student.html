@@ -5,27 +5,20 @@
 {% block content %}
 <h1 class="hero-title mb-4">{% trans "Привет" %}, {{ user.full_name|default:user.email }}!</h1>
 
-<h5 class="mb-3">{% trans "Моя группа" %}</h5>
+<h5 class="mb-3">{% trans "Ближайшие задания" %}</h5>
 <div class="row g-3 mb-4">
-  {% for m in memberships %}
-    <div class="col-md-4"><div class="card-pastel c-violet">
-      <h4>{{ m.group.name }}</h4>
-      <span class="badge-soft align-self-start">{{ m.get_status_display }}</span>
-    </div></div>
+  {% for t in upcoming %}
+    <div class="col-md-6 col-xl-4"><a href="{% url 'task_detail' t.pk %}" class="text-decoration-none text-reset">
+      <div class="card-pastel {{ t.card_css }}">
+        <div class="d-flex justify-content-between gap-2">
+          <span class="state {{ t.state_css }}">{{ t.state_label }}</span>
+          <span class="badge-soft">{{ t.subject.name }}</span>
+        </div>
+        <h5 class="mt-2">{{ t.title }}</h5>
+        <span class="small"><i class="bi bi-clock"></i> {% trans "до" %} {{ t.deadline|date:"d.m.Y H:i" }}</span>
+      </div></a></div>
   {% empty %}
-    <p class="text-muted">{% trans "Вы пока не состоите ни в одной группе." %}</p>
-  {% endfor %}
-</div>
-
-<h5 class="mb-3">{% trans "Предметы" %}</h5>
-<div class="row g-3 mb-4">
-  {% for s in subjects %}
-    <div class="col-md-4"><div class="card-pastel c-blue">
-      <h5>{{ s.name }}</h5>
-      <span class="small text-muted">{{ s.group.name }}</span>
-    </div></div>
-  {% empty %}
-    <p class="text-muted">{% trans "Предметы пока не добавлены." %}</p>
+    <p class="text-muted">{% trans "Активных заданий нет." %}</p>
   {% endfor %}
 </div>
 
@@ -44,8 +37,28 @@
 </div>
 {% endif %}
 
-<div class="card-pastel c-yellow">
-  <h5>{% trans "Задания" %}</h5>
-  <p class="mb-0">{% trans "Здесь появятся ваши задания и дедлайны." %}</p>
+<h5 class="mb-3">{% trans "Моя группа" %}</h5>
+<div class="row g-3 mb-4">
+  {% for m in memberships %}
+    <div class="col-md-4"><a href="{% url 'group_detail' m.group.pk %}" class="text-decoration-none text-reset">
+      <div class="card-pastel c-violet">
+        <h4>{{ m.group.name }}</h4>
+        <span class="badge-soft align-self-start">{{ m.get_status_display }}</span>
+      </div></a></div>
+  {% empty %}
+    <p class="text-muted">{% trans "Вы пока не состоите ни в одной группе." %}</p>
+  {% endfor %}
+</div>
+
+<h5 class="mb-3">{% trans "Предметы" %}</h5>
+<div class="row g-3">
+  {% for s in subjects %}
+    <div class="col-md-4"><div class="card-pastel c-blue">
+      <h5>{{ s.name }}</h5>
+      <span class="small text-muted">{{ s.group.name }}</span>
+    </div></div>
+  {% empty %}
+    <p class="text-muted">{% trans "Предметы пока не добавлены." %}</p>
+  {% endfor %}
 </div>
 {% endblock %}

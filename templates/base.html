@@ -24,6 +24,9 @@
       <a href="{% url 'group_list' %}" class="side-btn {% if 'group' in request.resolver_match.url_name %}active{% endif %}" title="{% trans 'Группы' %}">
         <i class="bi bi-people"></i>
       </a>
+      <a href="{% url 'task_list' %}" class="side-btn {% if 'task' in request.resolver_match.url_name %}active{% endif %}" title="{% trans 'Задания' %}">
+        <i class="bi bi-journal-check"></i>
+      </a>
       {% if user.is_teacher_like %}
         <a href="{% url 'permset_list' %}" class="side-btn {% if 'permset' in request.resolver_match.url_name %}active{% endif %}" title="{% trans 'Наборы разрешений' %}">
           <i class="bi bi-shield-check"></i>

@@ -47,3 +47,17 @@ def require_perm(user, code, group, subject=None):
 def require_group_owner(user, group):
     if not is_group_owner(user, group):
         raise PermissionDenied
+
+def allowed_subjects(user, code, group):
+    """Предметы группы, в которых пользователю разрешено действие `code`."""
+    return [s for s in group.subjects.all() if user_can(user, code, group, s)]
+
+
+def groups_for_action(user, code):
+    """Группы, где пользователь может выполнить действие хотя бы в одном предмете."""
+    if not user.is_authenticated:
+        return []
+    candidates = StudyGroup.objects.filter(
+        Q(pk__in=manageable_groups(user).values('pk')) | Q(role_assignments__user=user)
+    ).distinct()
+    return [g for g in candidates if allowed_subjects(user, code, g)]

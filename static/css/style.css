@@ -45,3 +45,22 @@ body { background: var(--mint); color: var(--text); font-family: 'DM Sans', sans
   .app { grid-template-columns: 1fr; border-radius: 20px; margin: 8px; padding: 12px; }
   .sidebar { flex-direction: row; justify-content: center; order: 3; }
 }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px;
+  border-radius: 40px; background: var(--panel); color: var(--text); text-decoration: none;
+}
+.chip.active { background: var(--text); color: #fff; }
+
+.state {
+  border-radius: 20px; padding: 4px 12px; font-size: .8rem;
+  font-weight: 500; display: inline-block;
+}
+.st-draft, .st-closed { background: #E5E5EA; }
+.st-archived { background: #E5E5EA; color: var(--muted); }
+.st-upcoming { background: var(--blue); }
+.st-open { background: var(--green); }
+.st-paused { background: var(--yellow); }
+.st-expired { background: var(--red); }
+
+.countdown { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+{% trans "Удалить задание?" as confirm_text %}
+
+<div class="card-pastel {{ task.card_css }} mb-4">
+  <a href="{% url 'task_list' %}" class="small text-muted text-decoration-none">← {% trans "Все задания" %}</a>
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <span class="state {{ task.state_css }}">{{ task.state_label }}</span>
+    <span class="badge-soft">{{ task.subject.name }}</span>
+    <span class="badge-soft">{% trans "Группа" %} {{ task.group.name }}</span>
+  </div>
+  <h1 class="mb-1">{{ task.title }}</h1>
+  {% if not hide_details %}<p class="mb-0">{{ task.description }}</p>{% endif %}
+  {% if task.author %}<span class="small text-muted">{% trans "Автор" %}: {{ task.author }}</span>{% endif %}
+</div>
+
+{% if can_edit %}
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="{% url 'task_edit' task.pk %}" class="btn btn-dark btn-sm">{% trans "Редактировать" %}</a>
+  {% for code, label in actions %}
+    <form method="post" action="{% url 'task_action' task.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="{{ code }}">
+      <button class="btn btn-sm btn-outline-dark">{{ label }}</button>
+    </form>
+  {% endfor %}
+  {% if can_delete %}
+    <form method="post" action="{% url 'task_delete' task.pk %}" onsubmit="return confirm('{{ confirm_text }}')">
+      {% csrf_token %}
+      <button class="btn btn-sm btn-outline-danger">{% trans "Удалить" %}</button>
+    </form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if hide_details %}
+  <div class="card-pastel c-blue mb-4">
+    <h5>{% trans "Задание откроется" %} {{ task.start_at|date:"d.m.Y H:i" }}</h5>
+    <p class="mb-0">{% trans "Инструкции и требования станут доступны с момента начала." %}</p>
+  </div>
+{% else %}
+  <div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3"><div class="card-pastel c-blue">
+      <span class="small text-muted">{% trans "Начало" %}</span>
+      <b>{{ task.start_at|date:"d.m.Y H:i" }}</b>
+    </div></div>
+    <div class="col-md-6 col-xl-3"><div class="card-pastel c-yellow">
+      <span class="small text-muted">{% trans "Дедлайн" %}</span>
+      <b>{{ task.deadline|date:"d.m.Y H:i" }}</b>
+    </div></div>
+    {% if countdown_target %}
+    <div class="col-md-6 col-xl-3"><div class="card-pastel c-green">
+      <span class="small text-muted">
+        {% if task.state == 'upcoming' %}{% trans "До начала" %}{% else %}{% trans "Осталось времени" %}{% endif %}
+      </span>
+      <span id="countdown" class="countdown"
+            data-target="{{ countdown_target|date:'c' }}"
+            data-now="{{ now|date:'c' }}"
+            data-day="{% trans 'д' %}"></span>
+    </div></div>
+    {% endif %}
+    <div class="col-md-6 col-xl-3"><div class="card-pastel c-violet">
+      <span class="small text-muted">{% trans "Максимальная оценка" %}</span>
+      <b>{{ task.max_score }}</b>
+    </div></div>
+  </div>
+
+  <div class="form-card mb-4" style="max-width:none">
+    <h5>{% trans "Инструкции" %}</h5>
+    <div>{{ task.instructions|default:"—"|linebreaks }}</div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6"><div class="card-pastel c-blue">
+      <h6>{% trans "Разрешённые форматы" %}</h6>
+      <div class="d-flex flex-wrap gap-1">
+        {% for f in task.formats_display %}<span class="badge-soft">{{ f }}</span>{% endfor %}
+      </div>
+      <span class="small">{% trans "До" %} {{ task.max_files }} {% trans "файлов, не более" %} {{ task.max_file_mb }} {% trans "МБ каждый" %}</span>
+    </div></div>
+    <div class="col-md-6"><div class="card-pastel c-yellow">
+      <h6>{% trans "Выступление и пересдача" %}</h6>
+      <span>
+        {% if task.requires_presentation %}
+          {% trans "Выступление: да," %} {{ task.presentation_minutes }} {% trans "мин" %}
+        {% else %}
+          {% trans "Выступление: не требуется" %}
+        {% endif %}
+      </span>
+      <span>
+        {% if task.allow_resubmission %}
+          {% trans "Пересдача разрешена" %}{% if task.resubmission_deadline %} {% trans "до" %} {{ task.resubmission_deadline|date:"d.m.Y H:i" }}{% endif %}
+        {% else %}
+          {% trans "Пересдача запрещена" %}
+        {% endif %}
+      </span>
+    </div></div>
+  </div>
+
+  <div class="card-pastel c-green mb-4">
+    <h5>{% trans "Сдача работы" %}</h5>
+    <p class="mb-0">{% trans "Форма отправки файлов, ссылок и текста появится в следующей части." %}</p>
+  </div>
+{% endif %}
+
+{% if can_edit %}
+<h5 class="mb-3">{% trans "История изменений" %}</h5>
+<div class="form-card" style="max-width:none">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>{% trans "Когда" %}</th><th>{% trans "Кто" %}</th><th>{% trans "Действие" %}</th><th>{% trans "Что" %}</th></tr></thead>
+      <tbody>
+        {% for l in logs %}
+          <tr>
+            <td>{{ l.created_at|date:"d.m.Y H:i" }}</td>
+            <td>{{ l.user|default:"—" }}</td>
+            <td>{{ l.get_action_display }}</td>
+            <td>{{ l.details_display }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<script src="{% static 'js/countdown.js' %}"></script>
+{% endblock %}

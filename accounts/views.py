@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from academics.models import Subject
 from academics.permissions import manageable_groups
 from .forms import RegisterForm
+from tasks.access import visible_tasks
 
 def home(request):
     """Лендинг. Вошедших сразу отправляем на панель."""
@@ -31,11 +32,16 @@ def register(request):
 def dashboard(request):
     """Главная панель: у студента и преподавателя она разная."""
     user = request.user
+    tasks = sorted(visible_tasks(user), key=lambda t: t.deadline)
+
     if user.is_teacher_like:
         groups = manageable_groups(user)
         return render(request, 'dashboard/teacher.html', {
             'groups': groups,
             'subjects': Subject.objects.filter(group__in=groups).select_related('group'),
+            'open_count': sum(1 for t in tasks if t.state == 'open'),
+            'draft_count': sum(1 for t in tasks if t.state == 'draft'),
+            'upcoming': [t for t in tasks if t.state == 'open'][:5],
         })
 
     memberships = user.memberships.select_related('group')
@@ -44,4 +50,5 @@ def dashboard(request):
         'memberships': memberships,
         'subjects': Subject.objects.filter(group_id__in=group_ids).select_related('group'),
         'roles': user.role_assignments.select_related('group', 'subject', 'permission_set'),
+        'upcoming': [t for t in tasks if t.state in ('open', 'upcoming')][:5],
     })

@@ -3,21 +3,34 @@
 {% block title %}{% trans "Панель преподавателя" %}{% endblock %}
 
 {% block content %}
-<h1 class="hero-title mb-4">{% trans "Панель управления" %}</h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h1 class="hero-title mb-0">{% trans "Панель управления" %}</h1>
+  <a href="{% url 'task_new' %}" class="btn btn-dark">+ {% trans "Создать задание" %}</a>
+</div>
 
 <div class="row g-3 mb-4">
-  <div class="col-md-4"><div class="card-pastel c-violet">
-    <span class="badge-soft align-self-start">{% trans "Группы" %}</span>
-    <h2>{{ groups|length }}</h2>
-  </div></div>
-  <div class="col-md-4"><div class="card-pastel c-blue">
-    <span class="badge-soft align-self-start">{% trans "Предметы" %}</span>
-    <h2>{{ subjects|length }}</h2>
-  </div></div>
-  <div class="col-md-4"><div class="card-pastel c-yellow">
-    <span class="badge-soft align-self-start">{% trans "Задания" %}</span>
-    <p class="mb-0">{% trans "Создание заданий появится в следующей части." %}</p>
-  </div></div>
+  <div class="col-6 col-xl-3"><div class="card-pastel c-violet">
+    <span class="badge-soft align-self-start">{% trans "Группы" %}</span><h2>{{ groups|length }}</h2></div></div>
+  <div class="col-6 col-xl-3"><div class="card-pastel c-blue">
+    <span class="badge-soft align-self-start">{% trans "Предметы" %}</span><h2>{{ subjects|length }}</h2></div></div>
+  <div class="col-6 col-xl-3"><div class="card-pastel c-green">
+    <span class="badge-soft align-self-start">{% trans "Сдача открыта" %}</span><h2>{{ open_count }}</h2></div></div>
+  <div class="col-6 col-xl-3"><div class="card-pastel c-yellow">
+    <span class="badge-soft align-self-start">{% trans "Черновики" %}</span><h2>{{ draft_count }}</h2></div></div>
+</div>
+
+<h5 class="mb-3">{% trans "Ближайшие дедлайны" %}</h5>
+<div class="row g-3 mb-4">
+  {% for t in upcoming %}
+    <div class="col-md-6 col-xl-4"><a href="{% url 'task_detail' t.pk %}" class="text-decoration-none text-reset">
+      <div class="card-pastel {{ t.card_css }}">
+        <span class="badge-soft align-self-start">{{ t.subject.name }} · {{ t.group.name }}</span>
+        <h5>{{ t.title }}</h5>
+        <span class="small"><i class="bi bi-clock"></i> {{ t.deadline|date:"d.m.Y H:i" }}</span>
+      </div></a></div>
+  {% empty %}
+    <p class="text-muted">{% trans "Активных заданий нет." %}</p>
+  {% endfor %}
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">

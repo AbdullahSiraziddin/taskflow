@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Задания" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h1 class="hero-title mb-0">{% trans "Задания" %}</h1>
+  <a href="{% url 'task_new' %}" class="btn btn-dark">+ {% trans "Создать задание" %}</a>
+</div>
+
+<div class="d-flex gap-2 flex-wrap mb-2">
+  <a class="chip {% if not state %}active{% endif %}" href="?{% if group_id %}group={{ group_id }}{% endif %}">{% trans "Все активные" %}</a>
+  {% for key, label in state_choices %}
+    <a class="chip {% if state == key %}active{% endif %}" href="?state={{ key }}{% if group_id %}&group={{ group_id }}{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if groups|length > 1 %}
+<div class="d-flex gap-2 flex-wrap mb-4">
+  <a class="chip {% if not group_id %}active{% endif %}" href="?{% if state %}state={{ state }}{% endif %}">{% trans "Все группы" %}</a>
+  {% for g in groups %}
+    <a class="chip {% if group_id == g.pk|stringformat:'s' %}active{% endif %}" href="?group={{ g.pk }}{% if state %}&state={{ state }}{% endif %}">{{ g.name }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="row g-3 mt-1">
+  {% for t in tasks %}
+    <div class="col-md-6 col-xl-4">
+      <a href="{% url 'task_detail' t.pk %}" class="text-decoration-none text-reset">
+        <div class="card-pastel {{ t.card_css }}">
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <span class="state {{ t.state_css }}">{{ t.state_label }}</span>
+            <span class="badge-soft">{{ t.subject.name }}</span>
+          </div>
+          <h5 class="mt-2">{{ t.title }}</h5>
+          <span class="small">{% trans "Группа" %} {{ t.group.name }}</span>
+          <span class="small"><i class="bi bi-clock"></i> {% trans "до" %} {{ t.deadline|date:"d.m.Y H:i" }}</span>
+        </div>
+      </a>
+    </div>
+  {% empty %}
+    <p class="text-muted">{% trans "Заданий пока нет." %}</p>
+  {% endfor %}
+</div>
+{% endblock %}
