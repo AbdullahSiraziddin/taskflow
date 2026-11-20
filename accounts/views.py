@@ -4,9 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
-from academics.models import StudyGroup, Subject
+from academics.models import Subject
+from academics.permissions import manageable_groups
 from .forms import RegisterForm
-
 
 def home(request):
     """Лендинг. Вошедших сразу отправляем на панель."""
@@ -32,14 +32,10 @@ def dashboard(request):
     """Главная панель: у студента и преподавателя она разная."""
     user = request.user
     if user.is_teacher_like:
-        if user.role == user.Role.ADMIN:
-            subjects = Subject.objects.select_related('group')
-        else:
-            subjects = user.taught_subjects.select_related('group')
+        groups = manageable_groups(user)
         return render(request, 'dashboard/teacher.html', {
-            'groups': StudyGroup.objects.all() if user.role == user.Role.ADMIN
-                      else StudyGroup.objects.filter(subjects__teachers=user).distinct(),
-            'subjects': subjects,
+            'groups': groups,
+            'subjects': Subject.objects.filter(group__in=groups).select_related('group'),
         })
 
     memberships = user.memberships.select_related('group')
@@ -47,4 +43,5 @@ def dashboard(request):
     return render(request, 'dashboard/student.html', {
         'memberships': memberships,
         'subjects': Subject.objects.filter(group_id__in=group_ids).select_related('group'),
+        'roles': user.role_assignments.select_related('group', 'subject', 'permission_set'),
     })

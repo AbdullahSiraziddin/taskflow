@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ group.name }}{% endblock %}
+
+{% block content %}
+{% trans "Удалить?" as confirm_text %}
+
+<div class="card-pastel c-violet mb-4">
+  <a href="{% url 'group_list' %}" class="small text-muted text-decoration-none">← {% trans "Все группы" %}</a>
+  <h1 class="mb-1">{% trans "Группа" %} {{ group.name }}</h1>
+  <p class="mb-0">{{ group.description }}</p>
+</div>
+
+<!-- Предметы -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% trans "Предметы" %}</h4>
+  {% if is_owner %}
+    <a href="{% url 'subject_create' group.pk %}" class="btn btn-sm btn-dark">+ {% trans "Предмет" %}</a>
+  {% endif %}
+</div>
+<div class="row g-3 mb-5">
+  {% for s in subjects %}
+    <div class="col-md-6 col-xl-4">
+      <div class="card-pastel c-blue">
+        <h5>{{ s.name }}</h5>
+        <span class="small">
+          {% for t in s.teachers.all %}{{ t }}{% if not forloop.last %}, {% endif %}{% empty %}{% trans "Преподаватель не назначен" %}{% endfor %}
+        </span>
+        {% if is_owner %}
+          <div class="d-flex gap-2 mt-2">
+            <a href="{% url 'subject_edit' s.pk %}" class="btn btn-sm btn-light">{% trans "Изменить" %}</a>
+            <form method="post" action="{% url 'subject_delete' s.pk %}" onsubmit="return confirm('{{ confirm_text }}')">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-light">{% trans "Удалить" %}</button>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-muted">{% trans "Предметов пока нет." %}</p>
+  {% endfor %}
+</div>
+
+<!-- Состав -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% trans "Состав группы" %}</h4>
+  {% if can_manage_members %}
+    <a href="{% url 'member_add' group.pk %}" class="btn btn-sm btn-dark">+ {% trans "Добавить студента" %}</a>
+  {% endif %}
+</div>
+<div class="form-card mb-5" style="max-width:none">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>{% trans "Студент" %}</th><th>{% trans "Статус" %}</th><th></th></tr></thead>
+      <tbody>
+        {% for m in members %}
+          <tr>
+            <td>{{ m.user }}</td>
+            <td>
+              {% if is_owner %}
+                <form method="post" action="{% url 'member_status' m.pk %}" class="d-flex gap-1">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm">
+                    {% for value, label in status_choices %}
+                      <option value="{{ value }}" {% if m.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-sm btn-dark">OK</button>
+                </form>
+              {% else %}
+                <span class="badge-soft">{{ m.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              {% if can_manage_members %}
+                <form method="post" action="{% url 'member_remove' m.pk %}" onsubmit="return confirm('{{ confirm_text }}')">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-outline-danger">{% trans "Убрать" %}</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Права (только преподаватель) -->
+{% if is_owner %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% trans "Назначенные права" %}</h4>
+  <div class="d-flex gap-2">
+    <a href="{% url 'permset_list' %}" class="btn btn-sm btn-outline-dark">{% trans "Мои наборы" %}</a>
+    <a href="{% url 'role_assign' group.pk %}" class="btn btn-sm btn-dark">+ {% trans "Назначить" %}</a>
+  </div>
+</div>
+<div class="form-card" style="max-width:none">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr>
+        <th>{% trans "Студент" %}</th><th>{% trans "Набор" %}</th>
+        <th>{% trans "Область" %}</th><th></th>
+      </tr></thead>
+      <tbody>
+        {% for a in assignments %}
+          <tr>
+            <td>{{ a.user }}</td>
+            <td>
+              <b>{{ a.permission_set.name }}</b><br>
+              {% for l in a.permission_set.labels %}<span class="badge-soft">{{ l }}</span> {% endfor %}
+            </td>
+            <td>{% if a.subject %}{{ a.subject.name }}{% else %}{% trans "Все предметы группы" %}{% endif %}</td>
+            <td class="text-end">
+              <form method="post" action="{% url 'role_revoke' a.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">{% trans "Отозвать" %}</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="text-muted">{% trans "Прав пока никому не назначено." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

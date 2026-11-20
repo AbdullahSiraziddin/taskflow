@@ -29,6 +29,21 @@
   {% endfor %}
 </div>
 
+{% if roles %}
+<h5 class="mb-3">{% trans "Мои полномочия" %}</h5>
+<div class="row g-3 mb-4">
+  {% for r in roles %}
+    <div class="col-md-6"><div class="card-pastel c-green">
+      <h6>{{ r.permission_set.name }} — {{ r.group.name }}</h6>
+      <span class="small">{% if r.subject %}{{ r.subject.name }}{% else %}{% trans "Все предметы группы" %}{% endif %}</span>
+      <div class="d-flex flex-wrap gap-1">
+        {% for l in r.permission_set.labels %}<span class="badge-soft">{{ l }}</span>{% endfor %}
+      </div>
+    </div></div>
+  {% endfor %}
+</div>
+{% endif %}
+
 <div class="card-pastel c-yellow">
   <h5>{% trans "Задания" %}</h5>
   <p class="mb-0">{% trans "Здесь появятся ваши задания и дедлайны." %}</p>

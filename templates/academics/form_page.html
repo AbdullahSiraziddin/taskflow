@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<a href="{{ back_url }}" class="small text-muted text-decoration-none">← {% trans "Назад" %}</a>
+<h1 class="my-3">{{ title }}</h1>
+<div class="form-card">
+  <form method="post">
+    {% csrf_token %}
+    {% include 'includes/form_fields.html' %}
+    <button class="btn btn-dark w-100">{% trans "Сохранить" %}</button>
+  </form>
+</div>
+{% endblock %}
